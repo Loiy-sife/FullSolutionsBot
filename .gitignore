@@ -1,25 +1,4 @@
-# ملفات البيئة
 .env
-.env.local
-.env*.local
-
-# بيئة بايثون
 __pycache__/
-*.py[cod]
-*$py.class
-*.so
-.Python
-
-# السجلات
+*.pyc
 *.log
-logs/
-
-# نظام التشغيل
-.DS_Store
-Thumbs.db
-
-# IDE
-.vscode/
-.idea/
-*.swp
-*.swo
