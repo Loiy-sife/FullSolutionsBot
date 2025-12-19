@@ -1,6 +1,6 @@
 import os
 import logging
-import asyncio
+import sys
 from telegram import Update
 from telegram.ext import Application, MessageHandler, filters, CommandHandler, ContextTypes
 from telegram.error import Forbidden
@@ -8,6 +8,19 @@ from telegram.error import Forbidden
 # ========== الإعدادات ==========
 TOKEN = os.environ.get('TELEGRAM_BOT_TOKEN')
 BOT_USERNAME = "FullSolutions_bot"
+
+# تحقق من وجود التوكن
+if not TOKEN:
+    print("❌ خطأ: لم يتم تعيين TELEGRAM_BOT_TOKEN في متغيرات البيئة!")
+    print("📋 خطوات الحل:")
+    print("1. اذهب إلى https://dashboard.render.com")
+    print("2. اختر خدمتك 'fullsolutions-bot'")
+    print("3. اضغط على تبويب Environment")
+    print("4. أضف متغير البيئة:")
+    print("   Key: TELEGRAM_BOT_TOKEN")
+    print("   Value: توكن_بوتك_هنا")
+    print("5. اضغط Save وأعد التشغيل")
+    sys.exit(1)
 
 # استجابات مخصصة
 CUSTOM_RESPONSES = {
@@ -70,8 +83,7 @@ async def handle_group_message(update: Update, context: ContextTypes.DEFAULT_TYP
                     
                     # تأكيد في المجموعة
                     await update.message.reply_text(
-                        f"✅ @{user.username}\nتم إرسال الرد لك في الرسائل الخاصة 📩\n"
-                        f"إذا لم تصل الرسالة، تأكد أنك بدأت محادثة مع البوت أولاً."
+                        f"✅ @{user.username}\nتم إرسال الرد لك في الرسائل الخاصة 📩"
                     )
                     
                     logger.info(f"تم إرسال رد إلى @{user.username}")
@@ -81,10 +93,7 @@ async def handle_group_message(update: Update, context: ContextTypes.DEFAULT_TYP
                     await update.message.reply_text(
                         f"🔒 @{user.username}\n\n"
                         f"عذراً، لا يمكنني إرسال رسالة خاصة لك.\n"
-                        f"يرجى:\n"
-                        f"1. البدء مع البوت: @{BOT_USERNAME}\n"
-                        f"2. الضغط على /start\n"
-                        f"3. إعادة المحاولة"
+                        f"يرجى البدء مع البوت أولاً: @{BOT_USERNAME}"
                     )
                     logger.warning(f"لا يمكن إرسال رسالة خاصة إلى @{user.username}")
                     
@@ -105,16 +114,11 @@ async def error_handler(update: Update, context: ContextTypes.DEFAULT_TYPE):
 
 def main():
     """الدالة الرئيسية"""
-    # التحقق من وجود التوكن
-    if not TOKEN:
-        logger.error("❌ لم يتم تعيين TELEGRAM_BOT_TOKEN في متغيرات البيئة!")
-        logger.error("يرجى إضافة التوكن كمتغير بيئة في Render")
-        return
-    
     logger.info("🚀 بدء تشغيل بوت الحلول الكاملة...")
+    logger.info(f"✅ التوكن مضبوط: {'نعم' if TOKEN else 'لا'}")
     
     try:
-        # إنشاء التطبيق (الإصدار 20.x)
+        # إنشاء التطبيق
         application = Application.builder().token(TOKEN).build()
         
         # إضافة المعالجات
@@ -127,7 +131,7 @@ def main():
         
         application.add_error_handler(error_handler)
         
-        # بدء البوت في وضع Polling
+        # بدء البوت
         logger.info("✅ البوت يعمل في وضع Polling...")
         application.run_polling(
             drop_pending_updates=True,
